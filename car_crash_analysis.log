@@ -1,0 +1,49 @@
+INFO : __main__ :: Initializing SparkSession...
+INFO : __main__ :: SparkSession now available as 'spark'. <SparkContext master=local[*] appName=CarCrashAnalysis>
+
+INFO : __main__ :: ANALYSIS 1: Number of crashes in which person killed is Male: 96782
+
+INFO : __main__ :: ANALYSIS 2: Number of two wheelers booked for crashes: 948
+
+INFO : __main__ :: ANALYSIS 3: State with highest number of accidents involving females: Texas
+
+INFO : __main__ :: ANALYSIS 4: Top5th to 15th Vehicle make involved in accidents including death: 
+['NISSAN', 'HONDA', 'GMC', 'HYUNDAI', 'KIA', 'JEEP', 'CHRYSLER', 'MAZDA', 'VOLKSWAGEN', 'PONTIAC', 'LEXUS']
+
+INFO : __main__ :: ANALYSIS 5: Top ethnic user group for each vehicle body style: 
+
+INFO : __main__ :: AMBULANCE:  WHITE
+INFO : __main__ :: BUS:  HISPANIC
+INFO : __main__ :: FARM EQUIPMENT:  WHITE
+INFO : __main__ :: FIRE TRUCK:  WHITE
+INFO : __main__ :: MOTORCYCLE:  WHITE
+INFO : __main__ :: NEV-NEIGHBORHOOD ELECTRIC VEHICLE:  WHITE
+INFO : __main__ :: PASSENGER CAR, 2-DOOR:  WHITE
+INFO : __main__ :: PASSENGER CAR, 4-DOOR:  WHITE
+INFO : __main__ :: PICKUP:  WHITE
+INFO : __main__ :: POLICE CAR/TRUCK:  WHITE
+INFO : __main__ :: POLICE MOTORCYCLE:  HISPANIC
+INFO : __main__ :: SPORT UTILITY VEHICLE:  WHITE
+INFO : __main__ :: TRUCK:  WHITE
+INFO : __main__ :: TRUCK TRACTOR:  WHITE
+INFO : __main__ :: VAN:  WHITE
+INFO : __main__ :: YELLOW SCHOOL BUS:  WHITE
+INFO : __main__ :: 
+
+INFO : __main__ :: ANALYSIS 6: Top 5 Zip Codes with highest number crashes with alcohols as the contributing factor to a crash: 
+
+INFO : __main__ :: 78521:  144
+INFO : __main__ :: 76010:  131
+INFO : __main__ :: 79936:  91
+INFO : __main__ :: 79938:  82
+INFO : __main__ :: 78753:  81
+INFO : __main__ :: 
+
+INFO : __main__ :: ANALYSIS 7: Count of Distinct Crash IDs where No Damaged Property was observed and Damage Level (VEH_DMAG_SCL~) is above 4 and car avails Insurance: 4
+
+INFO : __main__ :: ANALYSIS 8: top 5 Vehicle Makes where drivers are charged with speeding related offences, has licensed Drivers, uses top 10 used vehicle colours and has car licensed with the Top 25 states with highest number of offences: 
+INFO : __main__ :: FORD:  19308
+INFO : __main__ :: CHEVROLET:  16950
+INFO : __main__ :: TOYOTA:  11885
+INFO : __main__ :: DODGE:  7969
+INFO : __main__ :: NISSAN:  7358
