@@ -73,3 +73,57 @@ For more information, including advanced configuration options, see the [officia
 ## The Output
 * The Output [Single line solutions] of the Analysis is logged in a file called `car_crash_analysis.log` in root directory.
 * The Dataframe output is written in output directory in individual subfolders for each analysis problem in parquet format.
+
+
+## Project structure after spark-submit
+```bash
+assessment
+|-- Pipfile
+|-- Pipfile.lock
+|-- README.md
+|-- analysis.ipynb
+|-- analysis.py
+|-- build_dependencies.sh
+|-- car_crash_analysis.log
+|-- config.yaml
+|-- input
+|   |-- Data
+|       |-- Charges_use.csv
+|       |-- Damages_use.csv
+|       |-- Endorse_use.csv
+|       |-- Primary_Person_use.csv
+|       |-- Restrict_use.csv
+|       |-- Units_use.csv
+|-- output
+|   |-- analysis_1
+|   |   |-- _SUCCESS
+|   |   |-- part-00000-72b14d78-1f5b-433b-94e7-6c4f799c13ae-c000.snappy.parquet
+|   |-- analysis_2
+|   |   |-- _SUCCESS
+|   |   |-- part-00000-7a5bc396-a8c0-469a-bbc6-3e88e0d67ece-c000.snappy.parquet
+|   |-- analysis_3
+|   |   |-- _SUCCESS
+|   |   |-- part-00000-3c5da559-2239-4d0f-87d8-7b94e3068e3a-c000.snappy.parquet
+|   |-- analysis_4
+|   |   |-- _SUCCESS
+|   |   |-- part-00000-c10c9ec2-182d-40a9-8612-1cbcb2de190f-c000.snappy.parquet
+|   |-- analysis_5
+|   |   |-- _SUCCESS
+|   |   |-- part-00000-82f19e19-6038-4b91-af8f-8f655a30a041-c000.snappy.parquet
+|   |-- analysis_6
+|   |   |-- _SUCCESS
+|   |   |-- part-00000-c5f43558-0ecd-4e77-96fc-1f431c33afac-c000.snappy.parquet
+|   |-- analysis_7
+|   |   |-- _SUCCESS
+|   |   |-- part-00000-de550197-130a-4a03-a35e-cd43e6b0c67e-c000.snappy.parquet
+|   |-- analysis_8
+|       |-- _SUCCESS
+|       |-- part-00000-74e8a0a0-db5b-4e9d-a36a-7b581080f9c4-c000.snappy.parquet
+|-- packages.zip
+|-- run.sh
+|-- utils
+    |-- helper.py
+```
+
+####The output directory is now available with parquet files for each analysis
+#### Solutions are logged in `car_crash_analysis.log`
