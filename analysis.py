@@ -14,6 +14,7 @@ from utils.helper import extract_data, load_data_to_csv, read_config
 
 class CarCrashAnalysis:
     """Car Crash Analysis class for analysing US Vehicle Car Crash dataset"""
+
     def __init__(self, path_to_config_file):
         """Read All the CSV files in Data folder which has the car crash info"""
         self.input_file_paths = read_config(path_to_config_file).get("INPUT")
@@ -23,9 +24,7 @@ class CarCrashAnalysis:
         )
         self.Primary_person_use_df.cache()
 
-        self.Units_use_df = extract_data(
-            spark, self.input_file_paths.get("Units")
-        )
+        self.Units_use_df = extract_data(spark, self.input_file_paths.get("Units"))
         self.Units_use_df.cache()
 
         self.Damages_use_df = extract_data(spark, self.input_file_paths.get("Damages"))
@@ -91,9 +90,7 @@ class CarCrashAnalysis:
         # accident_info_df.show(10)
 
         # State with highest number of accidents
-        state_with_most_accidents = accident_info_df.first()[
-            "DRVR_LIC_STATE_ID"
-        ]
+        state_with_most_accidents = accident_info_df.first()["DRVR_LIC_STATE_ID"]
 
         # Load output to CSV output in parquet format
         load_data_to_csv(accident_info_df, output_path)
@@ -113,8 +110,7 @@ class CarCrashAnalysis:
             )
             .withColumn(
                 "ALL_INJURIES",
-                self.Units_use_df["TOT_INJRY_CNT"]
-                + self.Units_use_df["DEATH_CNT"],
+                self.Units_use_df["TOT_INJRY_CNT"] + self.Units_use_df["DEATH_CNT"],
             )
             .orderBy(col("ALL_INJURIES").desc())
         )
@@ -148,10 +144,14 @@ class CarCrashAnalysis:
         ethnic user group of each unique body style
         """
         # We need to join units_use_df and Primary_person_use_df
-        vehicle_and_ethnicity_info = self.Primary_person_use_df. \
-            join(self.Units_use_df, self.Primary_person_use_df["CRASH_ID"] ==
-                 self.Units_use_df["CRASH_ID"], how="inner").select\
-            (self.Units_use_df["VEH_BODY_STYL_ID"], self.Primary_person_use_df["PRSN_ETHNICITY_ID"])
+        vehicle_and_ethnicity_info = self.Primary_person_use_df.join(
+            self.Units_use_df,
+            self.Primary_person_use_df["CRASH_ID"] == self.Units_use_df["CRASH_ID"],
+            how="inner",
+        ).select(
+            self.Units_use_df["VEH_BODY_STYL_ID"],
+            self.Primary_person_use_df["PRSN_ETHNICITY_ID"],
+        )
         # vehicle_and_ethnicity_info.show(10, truncate=False)
 
         # Top ethnic user group of each unique body style
@@ -159,15 +159,25 @@ class CarCrashAnalysis:
 
         vehicle_and_ethnicity_df = vehicle_and_ethnicity_info.filter(
             vehicle_and_ethnicity_info["VEH_BODY_STYL_ID"].isin(
-                ["NA", "UNKNOWN", "NOT REPORTED", "OTHER  (EXPLAIN IN NARRATIVE)"]) == False). \
-            filter(vehicle_and_ethnicity_info["PRSN_ETHNICITY_ID"].isin(["NA", "UNKNOWN"]) == False)
+                ["NA", "UNKNOWN", "NOT REPORTED", "OTHER  (EXPLAIN IN NARRATIVE)"]
+            )
+            == False
+        ).filter(
+            vehicle_and_ethnicity_info["PRSN_ETHNICITY_ID"].isin(["NA", "UNKNOWN"])
+            == False
+        )
         # vehicle_and_ethnicity_df.show(10, truncate=False)
 
-        vehicle_and_ethnicity_df = vehicle_and_ethnicity_df. \
-            groupby("VEH_BODY_STYL_ID", "PRSN_ETHNICITY_ID").count(). \
-            withColumn("row_num", row_number().over(windowSpec)).filter(col("row_num") == 1)
+        vehicle_and_ethnicity_df = (
+            vehicle_and_ethnicity_df.groupby("VEH_BODY_STYL_ID", "PRSN_ETHNICITY_ID")
+            .count()
+            .withColumn("row_num", row_number().over(windowSpec))
+            .filter(col("row_num") == 1)
+        )
 
-        vehicle_and_ethnicity_df = vehicle_and_ethnicity_df.select(col("VEH_BODY_STYL_ID"), col("PRSN_ETHNICITY_ID"))
+        vehicle_and_ethnicity_df = vehicle_and_ethnicity_df.select(
+            col("VEH_BODY_STYL_ID"), col("PRSN_ETHNICITY_ID")
+        )
         vehicle_and_ethnicity_list = vehicle_and_ethnicity_df.collect()
         # Load output to CSV output in parquet format
         load_data_to_csv(vehicle_and_ethnicity_df, output_path)
@@ -178,13 +188,23 @@ class CarCrashAnalysis:
         Method to analyze car crashes where alcohol is a contributing
         factor, returning the top 5 zip codes from the analysis
         """
-        crashes_due_to_alcohol_df = \
-        self.Units_use_df.join(self.Primary_person_use_df, self.Units_use_df["CRASH_ID"]
-                               == self.Primary_person_use_df["CRASH_ID"], how='inner') \
-            .dropna(subset=["DRVR_ZIP"]) \
-            .filter(col("CONTRIB_FACTR_1_ID").like("%ALCOHOL%") | col("CONTRIB_FACTR_2_ID").like("%ALCOHOL%")
-                    | (col("PRSN_ALC_RSLT_ID") == "Positive")) \
-            .groupby("DRVR_ZIP").count().orderBy(col("count").desc()).limit(5)
+        crashes_due_to_alcohol_df = (
+            self.Units_use_df.join(
+                self.Primary_person_use_df,
+                self.Units_use_df["CRASH_ID"] == self.Primary_person_use_df["CRASH_ID"],
+                how="inner",
+            )
+            .dropna(subset=["DRVR_ZIP"])
+            .filter(
+                col("CONTRIB_FACTR_1_ID").like("%ALCOHOL%")
+                | col("CONTRIB_FACTR_2_ID").like("%ALCOHOL%")
+                | (col("PRSN_ALC_RSLT_ID") == "Positive")
+            )
+            .groupby("DRVR_ZIP")
+            .count()
+            .orderBy(col("count").desc())
+            .limit(5)
+        )
         # crashes_due_to_alcohol_df.show()
         # Load output to CSV output in parquet format
         load_data_to_csv(crashes_due_to_alcohol_df, output_path)
@@ -196,15 +216,28 @@ class CarCrashAnalysis:
         Property was observed and Damage Level (VEH_DMAG_SCL~)
         is above 4 and car avails Insurance
         """
-        damage_insurance_info = self.Damages_use_df.join(self.Units_use_df, on=["CRASH_ID"], how='inner')
+        damage_insurance_info = self.Damages_use_df.join(
+            self.Units_use_df, on=["CRASH_ID"], how="inner"
+        )
         # damage_insurance_info.select(col("CRASH_ID"), col("DAMAGED_PROPERTY")).show(10, truncate=False)
 
-        no_damage_insurace_availed_df = damage_insurance_info.filter(((col("VEH_DMAG_SCL_1_ID") > "DAMAGED 4") &
-                    (col("VEH_DMAG_SCL_1_ID").isin(["NA", "NO DAMAGE"]) == False))
-                                |((col("VEH_DMAG_SCL_2_ID") > "DAMAGED 4") &
-                                  (col("VEH_DMAG_SCL_2_ID").isin(["NA", "NO DAMAGE"]) == False))) \
-            .filter((col("DAMAGED_PROPERTY") == "NONE") | (col("DAMAGED_PROPERTY").like("NO DAMAGE%"))) \
+        no_damage_insurace_availed_df = (
+            damage_insurance_info.filter(
+                (
+                    (col("VEH_DMAG_SCL_1_ID") > "DAMAGED 4")
+                    & (col("VEH_DMAG_SCL_1_ID").isin(["NA", "NO DAMAGE"]) == False)
+                )
+                | (
+                    (col("VEH_DMAG_SCL_2_ID") > "DAMAGED 4")
+                    & (col("VEH_DMAG_SCL_2_ID").isin(["NA", "NO DAMAGE"]) == False)
+                )
+            )
+            .filter(
+                (col("DAMAGED_PROPERTY") == "NONE")
+                | (col("DAMAGED_PROPERTY").like("NO DAMAGE%"))
+            )
             .filter(col("FIN_RESP_TYPE_ID").like("%LIABILITY INSURANCE POLICY%"))
+        )
 
         # Load output to CSV output in parquet format
         load_data_to_csv(no_damage_insurace_availed_df, output_path)
@@ -219,30 +252,45 @@ class CarCrashAnalysis:
         Top 25 states with highest number of offences
         """
         # Top 10 used vehicle colors
-        vehicle_colors_df = self.Units_use_df.groupby(col("VEH_COLOR_ID")).count().orderBy(col("count").desc())
+        vehicle_colors_df = (
+            self.Units_use_df.groupby(col("VEH_COLOR_ID"))
+            .count()
+            .orderBy(col("count").desc())
+        )
 
         # top 10
         top_ten_vehicle_colors = vehicle_colors_df.limit(10)
         # top_ten_vehicle_colors.show()
 
         # Filtering null values from top_ten_vehicle_colors
-        vehicle_colors_df = vehicle_colors_df.filter((col("VEH_COLOR_ID") == "NA") == False)
+        vehicle_colors_df = vehicle_colors_df.filter(
+            (col("VEH_COLOR_ID") == "NA") == False
+        )
         top_ten_vehicle_colors = vehicle_colors_df.limit(10)
         # top_ten_vehicle_colors.show()
 
         # Top 25 states
-        vehicle_state_df = self.Units_use_df.groupBy(col("VEH_LIC_STATE_ID")).count().orderBy(col("count").desc())
+        vehicle_state_df = (
+            self.Units_use_df.groupBy(col("VEH_LIC_STATE_ID"))
+            .count()
+            .orderBy(col("count").desc())
+        )
         # vehicle_state_df.show(25)
 
         # Filter bad records in vehicle_state_df
         # We only need Vehicle state ID
-        vehicle_state_df = vehicle_state_df.filter(col("VEH_LIC_STATE_ID").cast("int").isNull())
+        vehicle_state_df = vehicle_state_df.filter(
+            col("VEH_LIC_STATE_ID").cast("int").isNull()
+        )
 
-        speeding_related_offenses_df = self.Charges_use_df.filter(col("CHARGE").like("%SPEED%"))
+        speeding_related_offenses_df = self.Charges_use_df.filter(
+            col("CHARGE").like("%SPEED%")
+        )
 
         # Drivers with license
-        drivers_with_license_df = self.Primary_person_use_df.filter(col("DRVR_LIC_TYPE_ID").isin(
-            ["DRIVER LICENSE", "COMMERCIAL DRIVER LIC."]))  # drivers_with_license_df.show(10)
+        drivers_with_license_df = self.Primary_person_use_df.filter(
+            col("DRVR_LIC_TYPE_ID").isin(["DRIVER LICENSE", "COMMERCIAL DRIVER LIC."])
+        )  # drivers_with_license_df.show(10)
 
         # uses top 10 used vehicle colours and has car licensed
         # with the Top 25 states with highest number of offences
@@ -261,19 +309,18 @@ class CarCrashAnalysis:
         # has licensed Drivers, uses top 10 used vehicle colours and
         # has car licensed with the Top 25 states with highest number of offences (to be deduced from the data)
 
-        final_df_with_vehicle_make_info_df = drivers_with_license_df.join(
-            speeding_related_offenses_df, on=["CRASH_ID"]).join(self.Units_use_df, on=["CRASH_ID"]). \
-            filter(self.Units_use_df["VEH_COLOR_ID"].isin(top_10_colors_list)). \
-            filter(self.Units_use_df["VEH_LIC_STATE_ID"].isin(top_25_states_list)). \
-            groupby("VEH_MAKE_ID").count(). \
-            orderBy(col("count").desc())
+        final_df_with_vehicle_make_info_df = (
+            drivers_with_license_df.join(speeding_related_offenses_df, on=["CRASH_ID"])
+            .join(self.Units_use_df, on=["CRASH_ID"])
+            .filter(self.Units_use_df["VEH_COLOR_ID"].isin(top_10_colors_list))
+            .filter(self.Units_use_df["VEH_LIC_STATE_ID"].isin(top_25_states_list))
+            .groupby("VEH_MAKE_ID")
+            .count()
+            .orderBy(col("count").desc())
+        )
         # Load output to CSV output in parquet format
         load_data_to_csv(final_df_with_vehicle_make_info_df, output_path)
         return final_df_with_vehicle_make_info_df.limit(5).collect()
-
-
-
-
 
         final_df_with_vehicle_make_info_df = final_df_with_vehicle_make_info_df.limit(5)
         final_df_with_vehicle_make_info_df.show()
@@ -354,23 +401,27 @@ if __name__ == "__main__":
     # We have the vehicle body style info in Units_use.csv and ethnicity info in Primary_person_use.csv,
     # we already have this info in Units_use_df and Primary_person_use_df
 
-    vehicle_and_ethnicity_list = car_crash_analysis.vehicle_body_style_crash_analysis(output_file_paths.get('analysis_5_output'))
+    vehicle_and_ethnicity_list = car_crash_analysis.vehicle_body_style_crash_analysis(
+        output_file_paths.get("analysis_5_output")
+    )
     logger.info("ANALYSIS 5: Top ethnic user group for each vehicle body style: \n")
     for vehicle_info in vehicle_and_ethnicity_list:
         logger.info(f"{vehicle_info[0]}:  {vehicle_info[1]}")
     logger.info("\n")
 
-
     # Analysis 6: Among the crashed cars, what are the Top 5 Zip Codes with highest number crashes with alcohols as
     # the contributing factor to a crash (Use Driver Zip Code)
 
-    #According to data dictionary - Primary_person_use.csv has the Car crash info with driver zip code and
+    # According to data dictionary - Primary_person_use.csv has the Car crash info with driver zip code and
     # alcohol result - DRVR_ZIP and PRSN_ALC_RSLT_ID, contributing factors are available in Units_use.csv  #### We
     # already have the DFs available as Primary_person_use_df and Units_use_df
     crashes_due_to_alcohol_list = car_crash_analysis.alcohol_related_crash_analysis(
-        output_file_paths.get('analysis_6_output'))
-    logger.info("ANALYSIS 6: Top 5 Zip Codes with highest number crashes with alcohols "
-                "as the contributing factor to a crash: \n")
+        output_file_paths.get("analysis_6_output")
+    )
+    logger.info(
+        "ANALYSIS 6: Top 5 Zip Codes with highest number crashes with alcohols "
+        "as the contributing factor to a crash: \n"
+    )
     for crash_info in crashes_due_to_alcohol_list:
         logger.info(f"{crash_info[0]}:  {crash_info[1]}")
     logger.info("\n")
@@ -382,11 +433,12 @@ if __name__ == "__main__":
     # regarding Damage level - VEH_DMAG_SCL, Insurance  #### We already have the DFs available as
     # Primary_person_use_df and Units_use_df
 
-    logger.info(f"ANALYSIS 7: Count of Distinct Crash IDs where No Damaged "
-                f"Property was observed and Damage Level (VEH_DMAG_SCL~) "
-                "is above 4 and car avails Insurance: "
-                f"{car_crash_analysis.insurance_related_crash_analysis(output_file_paths.get('analysis_7_output'))}\n")
-
+    logger.info(
+        f"ANALYSIS 7: Count of Distinct Crash IDs where No Damaged "
+        f"Property was observed and Damage Level (VEH_DMAG_SCL~) "
+        "is above 4 and car avails Insurance: "
+        f"{car_crash_analysis.insurance_related_crash_analysis(output_file_paths.get('analysis_7_output'))}\n"
+    )
 
     # Analysis 8: Determine the Top 5 Vehicle Makes where drivers are charged with speeding related offences,
     # has licensed Drivers, uses top 10 used vehicle colours and has car licensed with the Top 25 states with highest
@@ -394,10 +446,14 @@ if __name__ == "__main__":
 
     # According to data dictionary, we have the Vehicle info in Units_use.csv, Driver details in
     # primary_peron_use.cs  #### We already have the DFs available as Primary_person_use_df and Units_use_df
-    speeding_list = car_crash_analysis.speeding_related_crash_analysis(output_file_paths.get('analysis_8_output'))
-    logger.info(f"ANALYSIS 8: top 5 Vehicle Makes where drivers are charged "
-                f"with speeding related offences, has licensed Drivers, "
-                f"uses top 10 used vehicle colours and has car licensed with "
-                f"the Top 25 states with highest number of offences: ")
+    speeding_list = car_crash_analysis.speeding_related_crash_analysis(
+        output_file_paths.get("analysis_8_output")
+    )
+    logger.info(
+        f"ANALYSIS 8: top 5 Vehicle Makes where drivers are charged "
+        f"with speeding related offences, has licensed Drivers, "
+        f"uses top 10 used vehicle colours and has car licensed with "
+        f"the Top 25 states with highest number of offences: "
+    )
     for crash_info in speeding_list:
         logger.info(f"{crash_info[0]}:  {crash_info[1]}")

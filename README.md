@@ -64,7 +64,7 @@ For more information, including advanced configuration options, see the [officia
 #### Clone this assessment repository
 ```git clone <repo_name>```
 #### Run the command:
-```chmod u+x run.sh && ./run_sh```
+```chmod u+x run.sh && ./run.sh```
 
 ## The Input
 * Input CSV files are available in input/*.csv 
