@@ -1,0 +1,24 @@
+INPUT:
+  Charges: input/Data/Charges_use.csv
+  Damages: input/Data/Damages_use.csv
+  Endorse: input/Data/Endorse_use.csv
+  Primary_Person: input/Data/Primary_Person_use.csv
+  Units: input/Data/Units_use.csv
+  Restrict: input/Data/Restrict_use.csv
+
+OUTPUT:
+  analysis_1_output: output/analysis_1
+  analysis_2_output: output/analysis_2
+  analysis_3_output: output/analysis_3
+  analysis_4_output: output/analysis_4
+  analysis_5_output: output/analysis_5
+  analysis_6_output: output/analysis_6
+  analysis_7_output: output/analysis_7
+  analysis_8_output: output/analysis_8
+
+LOGGING:
+  namespace: '__main__'
+  level: INFO
+  formatter: '%(levelname)s : %(name)s :: %(message)s'
+  path: car_crash_analysis.log
+  mode: w
