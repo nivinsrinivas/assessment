@@ -61,10 +61,10 @@ For more information, including advanced configuration options, see the [officia
 * Execute spark-submit with the built packages.
 
 ## Running the analysis
-#### Clone this assessment repository
+#### Clone this assessment repo
 ```git clone <repo_name>```
 #### Run the command:
-```chmod u+x run.sh && ./run.sh```
+```cd assessment && chmod u+x run.sh && ./run.sh```
 
 ## The Input
 * Input CSV files are available in input/*.csv 
