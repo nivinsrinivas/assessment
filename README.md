@@ -51,7 +51,7 @@ For more information, including advanced configuration options, see the [officia
 
 #### build_dependencies.sh script
 * Builds a pipenv with all dependencies and packages required for the analysis.
-* It zips the packages packages.zip in root directory.
+* It zips the packages into packages.zip in root directory.
 * This package.zip is passed as a parameter in --py-files while running spark-submit.
 
 #### run.sh script 
