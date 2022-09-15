@@ -29,6 +29,8 @@ assessment [referred below as root too]
 ## Managing Project Dependencies using Pipenv
 ### Note: Python3 must be installed as a prerequisite
     Python Version used here: 3.10
+
+
 We use [pipenv](https://docs.pipenv.org) for managing project dependencies and Python environments (i.e. virtual environments). All direct packages dependencies (e.g. NumPy may be used in a User Defined Function), as well as all the packages used during development (e.g. PySpark, flake8 for code linting, IPython for interactive console sessions, etc.), are described in the `Pipfile`. Their **precise** downstream dependencies are described in `Pipfile.lock`.
 
 ### Installing Pipenv
@@ -46,6 +48,7 @@ brew install pipenv
 ```
 
 For more information, including advanced configuration options, see the [official pipenv documentation](https://docs.pipenv.org).
+
 
 ## Important scripts 
 
@@ -66,6 +69,15 @@ For more information, including advanced configuration options, see the [officia
 ```git clone <repo_name>```
 #### Run the command:
 ```cd assessment && chmod u+x run.sh && ./run.sh```
+
+### Switch Python Version
+#### In case you don't have Python3.10, follow these instructions
+* Open Pipfile
+* Change Python Version in ```[requires] ``` section
+to Python Version you have [>=3.6] 
+* set ```python_version = "3.6"``` [for example]
+* Save the file and run ```pipenv --python 3.6```
+* Head Over to **Running the analysis** section and follow the instructions.
 
 ## The Input
 * Input CSV files are available in input/*.csv 
