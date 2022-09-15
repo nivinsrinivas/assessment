@@ -22,5 +22,5 @@ echo "=============================================================="
 echo "Please check car_crash_analysis.log in root directory for the solutions and out Dataframes written in newly created output directory."
 echo "=============================================================="
 # Time elapsed
-echo "Elapsed Time: $(($end-$start)) seconds"
+echo "Elapsed Time: $(($end-$start)) seconds."
 echo "===========================DONE!============================"
