@@ -5,7 +5,7 @@ This Readme explains the instructions to setup the pyspark environment and run t
 ## Project Structure
 
 ```bash
-assessment
+assessment [referred below as root too]
 |-- Pipfile
 |-- Pipfile.lock
 |-- README.md
