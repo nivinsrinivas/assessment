@@ -27,7 +27,8 @@ assessment
 ```
 
 ## Managing Project Dependencies using Pipenv
-
+### Note: Python3 must be installed as a prerequisite
+    Python Version used here: 3.10
 We use [pipenv](https://docs.pipenv.org) for managing project dependencies and Python environments (i.e. virtual environments). All direct packages dependencies (e.g. NumPy may be used in a User Defined Function), as well as all the packages used during development (e.g. PySpark, flake8 for code linting, IPython for interactive console sessions, etc.), are described in the `Pipfile`. Their **precise** downstream dependencies are described in `Pipfile.lock`.
 
 ### Installing Pipenv
